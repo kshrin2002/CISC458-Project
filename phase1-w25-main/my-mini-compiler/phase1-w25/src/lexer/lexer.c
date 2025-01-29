@@ -78,6 +78,14 @@ Token get_next_token(const char *input, int *pos) {
     c = input[*pos];
 
     // TODO: Add comment handling here
+    // Added by Lucy
+    // Handle comments
+    if (c == "/" && input[*pos + 1] == "/") {
+        while (input[*pos] != '\n' && input[*pos] != '\0') {
+            (*pos)++; // skip everything in the comment
+        }
+        return get_next_token(input, pos); // get next token
+    }
 
     // Handle numbers
     if (isdigit(c)) {
@@ -95,12 +103,55 @@ Token get_next_token(const char *input, int *pos) {
 
     // TODO: Add keyword and identifier handling here
     // Hint: You'll have to add support for keywords and identifiers, and then string literals
+    // Added by Lucy
+    // Handle keywords and identifiers
+    if (isalpha(c) || c == '_') { // variable names start with a letter or _
+        int i = 0;
+        do {
+            token.lexeme[i++] = c;
+            (*pos)++;
+            c = input[*pos];
+        } while ((isalnum(c) || c == '_') && i < sizeof(token.lexeme) - 1);
+        token.lexeme[i] = '\0';
+        // check for keyword
+        if (strcmp(token.lexeme, "if") == 0 ||
+            strcmp(token.lexeme, "repeat") == 0 ||
+            strcmp(token.lexeme, "until") == 0) {
+            token.type = TOKEN_KEYWORD;
+            } else {
+                token.type = TOKEN_IDENTIFIER;
+            }
+        return token;
+    }
+
 
     // TODO: Add string literal handling here
+    // Added by Lucy
+    // Handle string literals
+    if (c == '"') {
+        int i = 0;
+        (*pos)++; // skip opening quote
+        c = input[*pos];
+        while (c != '"' && c != '\0' && i < sizeof(token.lexeme) - 1) {
+            token.lexeme[i++] = c;
+            (*pos)++;
+            c = input[*pos];
+        }
+        // check for closing quote
+        if (c == '"') {
+            token.lexeme[i] = '\0';
+            token.type = TOKEN_STRING;
+            (*pos)++;
+        } else {
+            token.error = ERROR_UNTERMINATED_STRING;
+        }
+        return token;
+    }
 
     // Handle operators
-    if (c == '+' || c == '-') {
-        if (last_token_type == 'o') {
+    if (c == '+' || c == '-' || c == '*' || c == '/' || c == '%') { // *, /, % added by Lucy
+        // if (last_token_type == 'o') {
+        if (input[*pos + 1] == c) {
             // Check for consecutive operators
             token.error = ERROR_CONSECUTIVE_OPERATORS;
             token.lexeme[0] = c;
@@ -116,7 +167,37 @@ Token get_next_token(const char *input, int *pos) {
         return token;
     }
 
+    // Added by Lucy
+    // Handle assignment and comparison operators
+    if (c == '=') {
+        token.type = TOKEN_ASSIGN;
+        token.lexeme[0] = c;
+        token.lexeme[1] = '\0';
+        (*pos)++;
+
+        // Check for "==" (comparison operator)
+        if (input[*pos] == '=') {
+            token.type = TOKEN_OPERATOR;
+            token.lexeme[1] = '=';
+            token.lexeme[2] = '\0';
+            (*pos)++;
+        }
+
+        return token;
+    }
+
+
     // TODO: Add delimiter handling here
+    // Added by Lucy
+    // Handle delimiters
+    if (strchr(";(),{}", c)) {
+        token.type = TOKEN_DELIMITER;
+        token.lexeme[0] = c;
+        token.lexeme[1] = '\0';
+        (*pos)++;
+        return token;
+    }
+
 
     // Handle invalid characters
     token.error = ERROR_INVALID_CHAR;
