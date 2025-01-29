@@ -18,6 +18,14 @@ typedef enum {
     TOKEN_EOF,
     TOKEN_NUMBER,     // e.g., "123", "456"
     TOKEN_OPERATOR,   // e.g., "+", "-"
+    // added by Lucy
+    TOKEN_IDENTIFIER, // variable names like "x", "varName"
+    TOKEN_ASSIGN,     // assignment operator "="
+    TOKEN_KEYWORD,    // keywords like "if", "repeat"
+    TOKEN_STRING,     // string literals like "hello", "world"
+    TOKEN_DELIMITER,  // delimiters like ",", ";", "{", "}", "(", ")"
+    TOKEN_COMMENT,    // comments like "// comment", "/* block comment */"
+    // end of added
     TOKEN_ERROR
 } TokenType;
 
@@ -28,7 +36,11 @@ typedef enum {
     ERROR_NONE,
     ERROR_INVALID_CHAR,
     ERROR_INVALID_NUMBER,
-    ERROR_CONSECUTIVE_OPERATORS
+    ERROR_CONSECUTIVE_OPERATORS,
+    // added by Lucy
+    ERROR_UNTERMINATED_STRING,
+    ERROR_INVALID_IDENTIFIER,
+    // end of added
 } ErrorType;
 
 /* Token structure to store token information
