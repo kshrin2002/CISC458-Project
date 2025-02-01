@@ -91,7 +91,7 @@ Token get_next_token(const char *input, int *pos) {
     }
 
     // Block comment handling by yash
-    if (c = '/' && input [*pos + 1] == '*') { // start of a block comment, edge case noted- ensure only enter block when you have sequence /*.
+    else if (c == '/' && input [*pos + 1] == '*') { // start of a block comment, edge case noted- ensure only enter block when you have sequence /*.
         (*pos) += 2; // skip the opening comment
         int comment_check = 0; // here we can simply make a flag to check if the comment is closed or not
 
