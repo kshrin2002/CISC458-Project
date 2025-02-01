@@ -25,6 +25,16 @@ void print_error(ErrorType error, int line, const char *lexeme) {
         case ERROR_UNTERMINATED_COMMENT:
             printf("Unterminated comment, check EOL\n");
             break;
+
+        // error cases - Dharsan R
+        case ERROR_UNTERMINATED_STRING:
+            printf("Unterminated string, check EOL\n");
+            break;
+    
+        case ERROR_INVALID_IDENTIFIER:
+            printf("Invalid identifier format\n");
+            break;
+
         default:
             printf("Unknown error\n");
     }
@@ -180,12 +190,27 @@ Token get_next_token(const char *input, int *pos) {
     // Handle string literals
     if (c == '"') {
         int i = 0;
-        do {
+        // add and skip teh first quote
+        token.lexeme[i++] = c;
+        (*pos)++;
+        c = input[*pos];
+
+        // run until last quote or end of input reached
+        while (c != '"' && c != '\0' && i < sizeof(token.lexeme) - 1) {
             token.lexeme[i++] = c;
             (*pos)++;
             c = input[*pos];
-        } while (c!='"' && i < sizeof(token.lexeme) - 1);
-        // include last quote
+
+            // add handling where string has escape sequences
+        }
+
+        // if the string is not terminated return an error
+        if (c != '"') {
+            token.error = ERROR_UNTERMINATED_STRING;
+            return token;
+        }
+
+        // add the last quote
         token.lexeme[i++] = c;
         (*pos)++;
         c = input[*pos];
@@ -195,6 +220,7 @@ Token get_next_token(const char *input, int *pos) {
         token.type = TOKEN_STRING;
         return token;
     }
+
 
     // Handle operators
     if (c == '+' || c == '-' || c == '*' || c == '/' || c == '%') { // *, /, % added by Lucy
