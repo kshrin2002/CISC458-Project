@@ -52,6 +52,26 @@ void print_token(Token token) {
         case TOKEN_EOF:
             printf("EOF");
             break;
+        // print cases - Dharsan R
+        case TOKEN_IDENTIFIER:
+            printf("IDENTIFIER");
+            break;
+        case TOKEN_ASSIGN:
+            printf("ASSIGN");
+            break;
+        case TOKEN_KEYWORD:
+            printf("KEYWORD");
+            break;
+        case TOKEN_STRING:
+            printf("STRING");
+            break;
+        case TOKEN_DELIMITER:
+            printf("DELIMITER");
+            break;
+        case TOKEN_COMMENT:
+            printf("COMMENT");
+            break;
+
         default:
             printf("UNKNOWN");
     }
@@ -88,32 +108,34 @@ Token get_next_token(const char *input, int *pos) {
             (*pos)++; // skip everything in the comment
         }
         return get_next_token(input, pos); // get next token
-    }
+    }// Block comment handling by yash 
 
-    // Block comment handling by yash
-    else if (c == '/' && input [*pos + 1] == '*') { // start of a block comment, edge case noted- ensure only enter block when you have sequence /*.
-        (*pos) += 2; // skip the opening comment
-        int comment_check = 0; // here we can simply make a flag to check if the comment is closed or not
+    // else if (c == '/' && input [*pos + 1] == '*') { // start of a block comment, edge case noted- ensure only enter block when you have sequence /*.
+    //     (*pos) += 2; // skip the opening comment
+    //     int comment_check = 0; // here we can simply make a flag to check if the comment is closed or not
 
-        // keep going until we reach the end of comment
-        while (input[*pos] != '\0') {
-            if (input[*pos] == '\n') {
-                current_line++;
-            }
-            if (input[*pos] == '*' && input[*pos + 1] == '/') {
-                (*pos) += 2; // skip the closing comment
-                comment_check = 1;
-                break;
-            }
-            (*pos)++;
-        }
-        if (comment_check == 0) {
-            token.error = ERROR_UNTERMINATED_COMMENT;
-            return token;
-            }
-        return get_next_token(input, pos); // grab next token after the comment
-    }
+    //     // keep going until we reach the end of comment
+    //     while (input[*pos] != '\0') {
+    //         if (input[*pos] == '\n') {
+    //             current_line++;
+    //         }
+    //         if (input[*pos] == '*' && input[*pos + 1] == '/') {
+    //             (*pos) += 2; // skip the closing comment
+    //             comment_check = 1;
+    //             break;
+    //         }
+    //         (*pos)++;
+    //     }
+    //     if (comment_check == 0) {
+    //         token.error = ERROR_UNTERMINATED_COMMENT;
+    //         return token;
+    //         }
+    //     return get_next_token(input, pos); // grab next token after the comment
+    // }
     // end yash block comment stuff
+
+
+
 
     // Handle numbers
     if (isdigit(c)) {
@@ -158,21 +180,15 @@ Token get_next_token(const char *input, int *pos) {
     // Handle string literals
     if (c == '"') {
         int i = 0;
-        (*pos)++; // skip opening quote
-        c = input[*pos];
-        while (c != '"' && c != '\0' && i < sizeof(token.lexeme) - 1) {
+        do {
             token.lexeme[i++] = c;
             (*pos)++;
             c = input[*pos];
-        }
-        // check for closing quote
-        if (c == '"') {
-            token.lexeme[i] = '\0';
-            token.type = TOKEN_STRING;
-            (*pos)++;
-        } else {
-            token.error = ERROR_UNTERMINATED_STRING;
-        }
+        } while (c!='"' && i < sizeof(token.lexeme) - 1);
+
+        token.lexeme[i] = '\0';
+
+        token.type = TOKEN_STRING;
         return token;
     }
 
@@ -238,7 +254,9 @@ Token get_next_token(const char *input, int *pos) {
 // This is a basic lexer that handles numbers (e.g., "123", "456"), basic operators (+ and -), consecutive operator errors, whitespace and newlines, with simple line tracking for error reporting.
 
 int main() {
-    const char *input = "123 + 456 - 789\n1 ++ 2"; // Test with multi-line input
+    //const char *input = "123 + 456 - 789\n1 ++ 2"; // Test with multi-line input
+    const char *input = "\"Test this\"";
+
     int position = 0;
     Token token;
 
@@ -252,20 +270,20 @@ int main() {
     return 0;
 
 
-    // comment tests [yash]
-    const char *input = 
-    "// Line comment\n"
-    "123\n"
-    "/* comment block */-456\n"
-    "/* Unterminated comment\n"
-    "789";
-    int position = 0;
-    Token token;
+    // // comment tests [yash]
+    // const char *input = 
+    // "// Line comment\n"
+    // "123\n"
+    // "/* comment block */-456\n"
+    // "/* Unterminated comment\n"
+    // "789";
+    // int position = 0;
+    // Token token;
 
-    printf("testing comments:\n");
-    do {
-        token = get_next_token(input, &position);
-        print_token(token);
-    } while (token.type != TOKEN_EOF);
+    // printf("testing comments:\n");
+    // do {
+    //     token = get_next_token(input, &position);
+    //     print_token(token);
+    // } while (token.type != TOKEN_EOF);
 
 }
