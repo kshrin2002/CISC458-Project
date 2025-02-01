@@ -22,6 +22,9 @@ void print_error(ErrorType error, int line, const char *lexeme) {
         case ERROR_CONSECUTIVE_OPERATORS:
             printf("Consecutive operators not allowed\n");
             break;
+        case ERROR_UNTERMINATED_COMMENT:
+            printf("Unterminated comment, check EOL\n");
+            break;
         default:
             printf("Unknown error\n");
     }
@@ -86,6 +89,31 @@ Token get_next_token(const char *input, int *pos) {
         }
         return get_next_token(input, pos); // get next token
     }
+
+    // Block comment handling by yash
+    if (c = '/' && input [*pos + 1] == '*') { // start of a block comment, edge case noted- ensure only enter block when you have sequence /*.
+        (*pos) += 2; // skip the opening comment
+        int comment_check = 0; // here we can simply make a flag to check if the comment is closed or not
+
+        // keep going until we reach the end of comment
+        while (input[*pos] != '\0') {
+            if (input[*pos] == '\n') {
+                current_line++;
+            }
+            if (input[*pos] == '*' && input[*pos + 1] == '/') {
+                (*pos) += 2; // skip the closing comment
+                comment_check = 1;
+                break;
+            }
+            (*pos)++;
+        }
+        if (comment_check == 0) {
+            token.error = ERROR_UNTERMINATED_COMMENT;
+            return token;
+            }
+        return get_next_token(input, pos); // grab next token after the comment
+    }
+    // end yash block comment stuff
 
     // Handle numbers
     if (isdigit(c)) {
@@ -222,4 +250,22 @@ int main() {
     } while (token.type != TOKEN_EOF);
 
     return 0;
+
+
+    // comment tests [yash]
+    const char *input = 
+    "// Line comment\n"
+    "123\n"
+    "/* comment block */-456\n"
+    "/* Unterminated comment\n"
+    "789";
+    int position = 0;
+    Token token;
+
+    printf("testing comments:\n");
+    do {
+        token = get_next_token(input, &position);
+        print_token(token);
+    } while (token.type != TOKEN_EOF);
+
 }

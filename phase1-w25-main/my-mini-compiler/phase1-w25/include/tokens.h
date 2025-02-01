@@ -41,6 +41,8 @@ typedef enum {
     ERROR_UNTERMINATED_STRING,
     ERROR_INVALID_IDENTIFIER,
     // end of added
+    // Yash
+    ERROR_UNTERMINATED_COMMENT, // user forgets to close comments with */
 } ErrorType;
 
 /* Token structure to store token information
