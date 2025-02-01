@@ -176,7 +176,7 @@ Token get_next_token(const char *input, int *pos) {
 
 
     // TODO: Add string literal handling here
-    // Added by Lucy
+    // Added by Dharsan
     // Handle string literals
     if (c == '"') {
         int i = 0;
@@ -185,6 +185,10 @@ Token get_next_token(const char *input, int *pos) {
             (*pos)++;
             c = input[*pos];
         } while (c!='"' && i < sizeof(token.lexeme) - 1);
+        // include last quote
+        token.lexeme[i++] = c;
+        (*pos)++;
+        c = input[*pos];
 
         token.lexeme[i] = '\0';
 
