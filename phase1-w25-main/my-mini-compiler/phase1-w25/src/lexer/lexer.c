@@ -120,29 +120,29 @@ Token get_next_token(const char *input, int *pos) {
         return get_next_token(input, pos); // get next token
     }// Block comment handling by yash 
 
-    // else if (c == '/' && input [*pos + 1] == '*') { // start of a block comment, edge case noted- ensure only enter block when you have sequence /*.
-    //     (*pos) += 2; // skip the opening comment
-    //     int comment_check = 0; // here we can simply make a flag to check if the comment is closed or not
+    else if (c == '/' && input [*pos + 1] == '*') { // start of a block comment, edge case noted- ensure only enter block when you have sequence /*.
+        (*pos) += 2; // skip the opening comment
+        int comment_check = 0; // here we can simply make a flag to check if the comment is closed or not
 
-    //     // keep going until we reach the end of comment
-    //     while (input[*pos] != '\0') {
-    //         if (input[*pos] == '\n') {
-    //             current_line++;
-    //         }
-    //         if (input[*pos] == '*' && input[*pos + 1] == '/') {
-    //             (*pos) += 2; // skip the closing comment
-    //             comment_check = 1;
-    //             break;
-    //         }
-    //         (*pos)++;
-    //     }
-    //     if (comment_check == 0) {
-    //         token.error = ERROR_UNTERMINATED_COMMENT;
-    //         return token;
-    //         }
-    //     return get_next_token(input, pos); // grab next token after the comment
-    // }
-    // end yash block comment stuff
+        // keep going until we reach the end of comment
+        while (input[*pos] != '\0') {
+            if (input[*pos] == '\n') {
+                current_line++;
+            }
+            if (input[*pos] == '*' && input[*pos + 1] == '/') {
+                (*pos) += 2; // skip the closing comment
+                comment_check = 1;
+                break;
+            }
+            (*pos)++;
+        }
+        if (comment_check == 0) {
+            token.error = ERROR_UNTERMINATED_COMMENT;
+            return token;
+            }
+        return get_next_token(input, pos); // grab next token after the comment
+    }
+    
 
 
 
@@ -298,6 +298,45 @@ int main() {
         token = get_next_token(input, &position);
         print_token(token);
     } while (token.type != TOKEN_EOF);
+
+    // Additional test cases added by Shrinidhi
+    const char *inputs[] = {
+        "123 + 456 - 789",
+        "int x = 42; y = x + 10;",
+        "123 ++ 456",
+        "x@ = 10;",
+        "\"Hello\"",
+        "\"String with \\\"quotes\\\"\"",
+        "\"Unterminated string",
+        "/* comment */ x = 10; // line"
+    };
+
+    const char *expected_outputs[] = {
+        "NUMBER 123, OPERATOR +, NUMBER 456, OPERATOR -, NUMBER 789",
+        "KEYWORD int, IDENTIFIER x, OPERATOR =, NUMBER 42, DELIMITER ;, IDENTIFIER y, OPERATOR =, IDENTIFIER x, OPERATOR +, NUMBER 10, DELIMITER ;",
+        "NUMBER 123, ERROR ++",
+        "IDENTIFIER x, ERROR @, OPERATOR =, NUMBER 10, DELIMITER ;",
+        "STRING \"Hello\"",
+        "STRING \"String with \\\"quotes\\\"\"",
+        "ERROR Unterminated string",
+        "IDENTIFIER x, OPERATOR =, NUMBER 10, DELIMITER ;"
+    };
+
+    //end of test cases
+
+    int num_tests = sizeof(inputs) / sizeof(inputs[0]);
+
+    for (int i = 0; i < num_tests; i++) {
+        position = 0;
+        printf("\nTesting Input: \"%s\"\n", inputs[i]);
+
+        do {
+            token = get_next_token(inputs[i], &position);
+            print_token(token);
+        } while (token.type != TOKEN_EOF);
+
+        printf("\nExpected Output: %s\n", expected_outputs[i]);
+    }
 
     return 0;
 
