@@ -175,6 +175,7 @@ Token get_next_token(const char *input, int *pos) {
         token.lexeme[i] = '\0';
         // check for keyword
         if (strcmp(token.lexeme, "if") == 0 ||
+            strcmp(token.lexeme, "int") == 0 ||
             strcmp(token.lexeme, "repeat") == 0 ||
             strcmp(token.lexeme, "until") == 0) {
             token.type = TOKEN_KEYWORD;
@@ -285,7 +286,8 @@ Token get_next_token(const char *input, int *pos) {
 
 int main() {
     //const char *input = "123 + 456 - 789\n1 ++ 2"; // Test with multi-line input
-    const char *input = "\"Test this\"";
+    // const char *input = "\"Test this\"";
+    const char *input = "int x = 42;";
 
     int position = 0;
     Token token;
@@ -317,3 +319,4 @@ int main() {
     // } while (token.type != TOKEN_EOF);
 
 }
+
