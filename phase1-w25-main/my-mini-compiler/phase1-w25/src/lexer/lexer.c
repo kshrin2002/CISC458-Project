@@ -113,7 +113,7 @@ Token get_next_token(const char *input, int *pos) {
     // TODO: Add comment handling here
     // Added by Lucy
     // Handle comments
-    if (c == "/" && input[*pos + 1] == "/") {
+    if (c == '/' && input[*pos + 1] == '/') {
         while (input[*pos] != '\n' && input[*pos] != '\0') {
             (*pos)++; // skip everything in the comment
         }
@@ -203,6 +203,8 @@ Token get_next_token(const char *input, int *pos) {
             c = input[*pos];
 
             // add handling where string has escape sequences
+
+            // must ignore whietspace characters
         }
 
         // if the string is not terminated return an error
@@ -223,8 +225,8 @@ Token get_next_token(const char *input, int *pos) {
     }
 
 
-    // Handle operators
-    if (c == '+' || c == '-' || c == '*' || c == '/' || c == '%') { // *, /, % added by Lucy
+    // Handle operators 
+    if (c == '+' || c == '-' || c == '*' || c == '%') { // *, /, % added by Lucy
         // if (last_token_type == 'o') {
         if (input[*pos + 1] == c) {
             // Check for consecutive operators
