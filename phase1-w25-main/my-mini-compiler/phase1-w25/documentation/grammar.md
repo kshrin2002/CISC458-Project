@@ -1,29 +1,63 @@
-//grammar rules
+# Grammar Rules
 
-Keywords:
+## Keywords
 
-if
+**if, int, repeat, until**
+- Core control flow and variable declaration keywords used in the language
+- Must be written exactly as specified, case-sensitive
 
-int
+## Identifiers
+- Must start with a letter (a-z, A-Z)
+- Can contain letters and digits (0-9) after the first character
+- Used for variable names, function names, and other user-defined elements
+- Example: `myVariable`, `count1`, `userName`
 
-repeat
+## Numbers
+- Consists of one or more digits (0-9)
+- Represents integer values in the language
+- Example: `42`, `100`, `5280`
 
-until
+## Operators
 
-Identifiers:Starts with letter (a-z, A-Z), contains digits (0-9) 
+### Arithmetic Operators
+- `+` : Addition
+- `-` : Subtraction
+- `*` : Multiplication
+- `/` : Division
 
-Numbers: Number that consists several digits (0-9)
+### Assignment Operator
+- `=` : Assigns a value to a variable
+- Example: `x = 5`
 
-Operators:
+## String Literals
+- Must be enclosed in double quotes (`""`)
+- Supports escape characters:
+  - `\"` : Double quote
+  - `\\` : Backslash
+  - `\n` : Newline
+- Example: `"Hello\nWorld"`, `"Use \"quotes\" here"`
 
-Arithmetic Operators: +,-,*,/
+## Delimiters
+- `:` : Used for declarations and labels
+- `{` and `}` : Block delimiters
+- `(` and `)` : Expression grouping
+- Used to structure and organize code elements
 
-Assignment Operators: = 
+## Comments
 
-String literals: Escape characters: \”, \\, \n, Enclosed in double quotes (“”)
+### Single-line Comments
+- Begin with `//`
+- Continue until end of line
+- Example: `// This is a single-line comment`
 
-Delimiters: :,{,},(,)
-
-Comments: Single-line comments: //This is a comment
-
-Multi-line comments: /*This is a multi-line comment*/
+### Multi-line Comments
+- Begin with `/**`
+- End with `**/`
+- Can span multiple lines
+- Example:
+  ```
+  /**
+  This is a
+  multi-line comment
+  **/
+  ```
