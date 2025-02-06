@@ -254,7 +254,7 @@ Token get_next_token(const char *input, int *pos) {
             token.error = ERROR_CONSECUTIVE_OPERATORS;
             token.lexeme[0] = c;
             token.lexeme[1] = '\0';
-            (*pos)++;
+            (*pos)+=2;
             return token;
         }
         token.type = TOKEN_OPERATOR;
@@ -331,6 +331,7 @@ int main() {
         "\"This vallidates\tspacing escape\nsequences\"",
         "\"String with \\\"quotes\\\"\"",
         "\"Unterminated string"
+
     };
 
     const char *expected_outputs[] = {
@@ -340,7 +341,7 @@ int main() {
         "IDENTIFIER x, ERROR @, OPERATOR =, NUMBER 10, DELIMITER ;",
         "STRING \"Hello\"",
         "IDENTIFIER x, OPERATOR =, NUMBER 10, DELIMITER ;",
-        "NUMBER 456, OPERATOR -....... ;",
+        "NUMBER 123, OPERATOR +, NUMBER 456, OPERATOR -, NUMBER 789, NUMBER 1, ERROR ++, NUMBER 2",
         "ERROR String too Long",
         "New Line operator",
         "STRING \"String with \\\"quotes\\\"\"",
