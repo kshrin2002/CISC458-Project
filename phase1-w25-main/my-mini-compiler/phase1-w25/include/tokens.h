@@ -40,9 +40,12 @@ typedef enum {
     // added by Lucy
     ERROR_UNTERMINATED_STRING,
     ERROR_INVALID_IDENTIFIER,
-    // end of added
     // Yash
     ERROR_UNTERMINATED_COMMENT, // user forgets to close comments with */
+    // Dharsan
+    ERROR_STRING_BUFFER_OVERFLOW,
+
+
 } ErrorType;
 
 /* Token structure to store token information

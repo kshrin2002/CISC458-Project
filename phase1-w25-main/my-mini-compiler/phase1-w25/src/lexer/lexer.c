@@ -26,11 +26,15 @@ void print_error(ErrorType error, int line, const char *lexeme) {
             printf("Unterminated comment, check EOL\n");
             break;
 
-        // error cases - Dharsan R
+        // error cases added by - Dharsan R
         case ERROR_UNTERMINATED_STRING:
             printf("Unterminated string, check EOL\n");
             break;
-    
+
+        case ERROR_STRING_BUFFER_OVERFLOW:
+            printf("String too long, buffer overflow reached\n");
+            break;
+
         case ERROR_INVALID_IDENTIFIER:
             printf("Invalid identifier format\n");
             break;
@@ -145,8 +149,6 @@ Token get_next_token(const char *input, int *pos) {
     
 
 
-
-
     // Handle numbers
     if (isdigit(c)) {
         int i = 0;
@@ -198,13 +200,32 @@ Token get_next_token(const char *input, int *pos) {
 
         // run until last quote or end of input reached
         while (c != '"' && c != '\0' && i < sizeof(token.lexeme) - 1) {
+            
+            if (c=='\\'){
+                token.lexeme[i++] = c;
+                (*pos)++;
+                c = input[*pos];
+            }
+
             token.lexeme[i++] = c;
             (*pos)++;
             c = input[*pos];
 
-            // add handling where string has escape sequences
+            // add handling where string has escape sequences include them within the quote
+            
+        }
+        // if size is exceeded and string has not been terminated then return a buffer overlflow
+        if (i == sizeof(token.lexeme) - 1 && c!='"'){
+            token.error = ERROR_STRING_BUFFER_OVERFLOW;
 
-            // must ignore whietspace characters
+            while (input[*pos]!= '\0'){
+                if (input[*pos] == '"') {
+                    (*pos) += 1; // skip the closing comment
+                    break;
+                }
+                (*pos)++;
+            }
+            return token;
         }
 
         // if the string is not terminated return an error
@@ -226,7 +247,7 @@ Token get_next_token(const char *input, int *pos) {
 
 
     // Handle operators 
-    if (c == '+' || c == '-' || c == '*' || c == '%') { // *, /, % added by Lucy
+    if (c == '+' || c == '-' || c == '*' || c=='/' || c == '%') { // *, /, % added by Lucy
         // if (last_token_type == 'o') {
         if (input[*pos + 1] == c) {
             // Check for consecutive operators
@@ -289,17 +310,17 @@ Token get_next_token(const char *input, int *pos) {
 int main() {
     //const char *input = "123 + 456 - 789\n1 ++ 2"; // Test with multi-line input
     // const char *input = "\"Test this\"";
-    const char *input = "int x = 42;";
+    // const char *input = "int x = 42;";
 
     int position = 0;
     Token token;
 
-    printf("Analyzing input:\n%s\n\n", input);
+    // printf("Analyzing input:\n%s\n\n", input);
 
-    do {
-        token = get_next_token(input, &position);
-        print_token(token);
-    } while (token.type != TOKEN_EOF);
+    // do {
+    //     token = get_next_token(input, &position);
+    //     print_token(token);
+    // } while (token.type != TOKEN_EOF);
 
     // Additional test cases added by Shrinidhi
     const char *inputs[] = {
@@ -308,9 +329,12 @@ int main() {
         "123 ++ 456",
         "x@ = 10;",
         "\"Hello\"",
+        "/* comment */ x = 10; // line",
+        "123 + 456 - 789\n1 ++ 2",
+        "\"Lorem ipsum dolor sit amet, \nconsectetur adipiscing elit. Sed nunc orci, interdum at imperdiet ut, fringilla\"",
+        "\"This vallidates\tspacing escape\nsequences\"",
         "\"String with \\\"quotes\\\"\"",
-        "\"Unterminated string",
-        "/* comment */ x = 10; // line"
+        "\"Unterminated string"
     };
 
     const char *expected_outputs[] = {
@@ -319,9 +343,12 @@ int main() {
         "NUMBER 123, ERROR ++",
         "IDENTIFIER x, ERROR @, OPERATOR =, NUMBER 10, DELIMITER ;",
         "STRING \"Hello\"",
+        "IDENTIFIER x, OPERATOR =, NUMBER 10, DELIMITER ;",
+        "NUMBER 456, OPERATOR -....... ;",
+        "ERROR String too Long",
+        "New Line operator",
         "STRING \"String with \\\"quotes\\\"\"",
-        "ERROR Unterminated string",
-        "IDENTIFIER x, OPERATOR =, NUMBER 10, DELIMITER ;"
+        "ERROR Unterminated string"
     };
 
     //end of test cases
