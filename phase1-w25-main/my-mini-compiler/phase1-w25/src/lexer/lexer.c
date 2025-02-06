@@ -308,10 +308,6 @@ Token get_next_token(const char *input, int *pos) {
 // This is a basic lexer that handles numbers (e.g., "123", "456"), basic operators (+ and -), consecutive operator errors, whitespace and newlines, with simple line tracking for error reporting.
 
 int main() {
-    //const char *input = "123 + 456 - 789\n1 ++ 2"; // Test with multi-line input
-    // const char *input = "\"Test this\"";
-    // const char *input = "int x = 42;";
-
     int position = 0;
     Token token;
 
