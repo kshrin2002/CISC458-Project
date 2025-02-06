@@ -23,7 +23,7 @@ void print_error(ErrorType error, int line, const char *lexeme) {
             printf("Consecutive operators not allowed\n");
             break;
         case ERROR_UNTERMINATED_COMMENT:
-            printf("Unterminated comment, check EOL\n");
+            printf("Unterminated multi line comment, check EOL\n");
             break;
 
         // error cases added by - Dharsan R
@@ -32,7 +32,7 @@ void print_error(ErrorType error, int line, const char *lexeme) {
             break;
 
         case ERROR_STRING_BUFFER_OVERFLOW:
-            printf("String too long, buffer overflow reached\n");
+            printf("String too long, buffer overflow reached! Make string shorter or split.\n");
             break;
 
         case ERROR_INVALID_IDENTIFIER:
@@ -319,13 +319,7 @@ int main() {
     int position = 0;
     Token token;
 
-    // printf("Analyzing input:\n%s\n\n", input);
-
-    // do {
-    //     token = get_next_token(input, &position);
-    //     print_token(token);
-    // } while (token.type != TOKEN_EOF);
-
+    // These test cases allow us to input muliple token and match with expected output
     // Additional test cases added by Shrinidhi
     const char *inputs[] = {
         "123 + 456 - 789",
@@ -338,8 +332,8 @@ int main() {
         "\"Lorem ipsum dolor sit amet, \nconsectetur adipiscing elit. Sed nunc orci, interdum at imperdiet ut, fringilla\"",
         "\"This vallidates\tspacing escape\nsequences\"",
         "\"String with \\\"quotes\\\"\"",
-        "\"Unterminated string"
-
+        "\"Unterminated string",
+        "/* Unterminated comment\n"
     };
 
     const char *expected_outputs[] = {
@@ -353,7 +347,9 @@ int main() {
         "ERROR String too Long",
         "New Line operator",
         "STRING \"String with \\\"quotes\\\"\"",
-        "ERROR Unterminated string"
+        "ERROR Unterminated string",
+        "ERROR Unterminated comment"
+        
     };
 
     //end of test cases
@@ -376,23 +372,6 @@ int main() {
     }
 
     return 0;
-
-
-    // // comment tests [yash]
-    // const char *input = 
-    // "// Line comment\n"
-    // "123\n"
-    // "/* comment block */-456\n"
-    // "/* Unterminated comment\n"
-    // "789";
-    // int position = 0;
-    // Token token;
-
-    // printf("testing comments:\n");
-    // do {
-    //     token = get_next_token(input, &position);
-    //     print_token(token);
-    // } while (token.type != TOKEN_EOF);
 
 }
 
