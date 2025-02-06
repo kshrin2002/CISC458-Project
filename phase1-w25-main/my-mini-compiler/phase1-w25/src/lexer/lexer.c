@@ -193,32 +193,39 @@ Token get_next_token(const char *input, int *pos) {
     // Handle string literals
     if (c == '"') {
         int i = 0;
-        // add and skip teh first quote
+        // add and skip the first quote character
         token.lexeme[i++] = c;
         (*pos)++;
         c = input[*pos];
 
-        // run until last quote or end of input reached
+        // run until last quote or end of input reached adding a character each loop
         while (c != '"' && c != '\0' && i < sizeof(token.lexeme) - 1) {
-            
+
+            // adds handling where string has escape sequences include them within the quotes
+            // helps overcome cases where the a quotation is a part of the string
             if (c=='\\'){
                 token.lexeme[i++] = c;
                 (*pos)++;
                 c = input[*pos];
             }
 
+            // add character and increement pointer 
             token.lexeme[i++] = c;
             (*pos)++;
             c = input[*pos];
-
-            // add handling where string has escape sequences include them within the quote
-            
         }
+
         // if size is exceeded and string has not been terminated then return a buffer overlflow
         if (i == sizeof(token.lexeme) - 1 && c!='"'){
+            // throws an error because the string is too long
             token.error = ERROR_STRING_BUFFER_OVERFLOW;
 
+
+            // we still want to check if the string has been terminated and also remove the next bit of
+            // characters it allows tokenization of the part that is out of the string
             while (input[*pos]!= '\0'){
+                // includes the last quote if it exists if it doesn't still throws buffer error until
+                // it is fixes/made shorter then the termination error can take over
                 if (input[*pos] == '"') {
                     (*pos) += 1; // skip the closing comment
                     break;
@@ -239,6 +246,7 @@ Token get_next_token(const char *input, int *pos) {
         (*pos)++;
         c = input[*pos];
 
+        // closes the string
         token.lexeme[i] = '\0';
 
         token.type = TOKEN_STRING;
@@ -362,6 +370,8 @@ int main() {
         } while (token.type != TOKEN_EOF);
 
         printf("\nExpected Output: %s\n", expected_outputs[i]);
+
+        printf("--------------------------------------\n");
     }
 
     return 0;
