@@ -367,11 +367,12 @@ int main() {
         do {
             token = get_next_token(inputs[i], &position);
             print_token(token);
+
         } while (token.type != TOKEN_EOF);
 
         printf("\nExpected Output: %s\n", expected_outputs[i]);
 
-        printf("--------------------------------------\n");
+        printf("---------------------------------------------\n");
     }
 
     return 0;
