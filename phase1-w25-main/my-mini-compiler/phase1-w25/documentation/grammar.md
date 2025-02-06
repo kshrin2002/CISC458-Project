@@ -35,6 +35,7 @@
   - `\"` : Double quote
   - `\\` : Backslash
   - `\n` : Newline
+  - `\t` : Tab Space
 - Example: `"Hello\nWorld"`, `"Use \"quotes\" here"`
 
 ## Delimiters
@@ -46,11 +47,13 @@
 ## Comments
 
 ### Single-line Comments
+- **Not Tokenized**
 - Begin with `//`
 - Continue until end of line
 - Example: `// This is a single-line comment`
 
 ### Multi-line Comments
+- **Not Tokenized**
 - Begin with `/**`
 - End with `**/`
 - Can span multiple lines

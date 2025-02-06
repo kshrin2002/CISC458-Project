@@ -1,5 +1,7 @@
 # Lexer Error Codes and Handling
 
+New error codes were added to allow handling of string and comment errors
+
 **ERROR_NONE**
 - No errors (default state)
 

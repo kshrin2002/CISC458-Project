@@ -1,64 +1,83 @@
-Design decisions:
+# Design Decisions
 
-Comments are ignored
+- **Comment Handling**
+  - Comments are ignored in tokenization
+  - Nested comments are not supported
+  - Maintains counter for newlines in multi-line comments
+  - Uses two-character lookahead for accurate comment detection
 
-Nested comments are not supported
+- **String Handling**
+  - Each string must start with and be terminated by `"`
+  - It supports escape characters but `\n` & `\t` are deafultly handled by lexer and space is displayed in token
+  - Strings with quotes and backslash are displayed with their esacpe sequences
+  - If string overflows the buffer error is displayed and panic mode used skipping string
+  - If string overflows & unterminated defaults to unterminated error
+  - Handles unterminated strings by looking for closing quotes
 
-Counter for counting new lines in a multi-line comment
+- **Error Codes** and decesions can be found in `error_code.md`
+- **Grammer Rules** and decesions can be found in `grammar_rules.md`
 
-Two-character lookahead for correct comment detection
+### Token Types Added:
 
-Test cases: 
+The lexer supports the following added token types from the base:
 
-Inputs:
+| Token Type | Description | Examples |
+|------------|-------------|----------|
+| `TOKEN_IDENTIFIER` | Variable and function names | `x`, `varName`, `myFunction` |
+| `TOKEN_ASSIGN` | Assignment operator | `=` |
+| `TOKEN_KEYWORD` | Reserved language keywords | `if`, `repeat`, `while` |
+| `TOKEN_STRING` | String literals | `"hello"`, `"world"` |
+| `TOKEN_DELIMITER` | Syntax delimiters | `,`, `;`, `{`, `}`, `(`, `)` |
+| `TOKEN_COMMENT` | Single and multi-line comments | `// comment`, `/* block comment */` |
 
-"123 + 456 - 789",
+</br></br>
 
-"int x = 42; y = x + 10;",
+# Test Cases and Expected Outputs
 
-"123 ++ 456",
+## Test 1: Basic Arithmetic
+- Input: `"123 + 456 - 789"`
+- Output: `"NUMBER 123, OPERATOR +, NUMBER 456, OPERATOR -, NUMBER 789"`
 
-"x@ = 10;",
+## Test 2: Variable Declaration and Assignment
+- Input: `"int x = 42; y = x + 10;"`
+- Output: `"KEYWORD int, IDENTIFIER x, OPERATOR =, NUMBER 42, DELIMITER ;, IDENTIFIER y, OPERATOR =, IDENTIFIER x, OPERATOR +, NUMBER 10, DELIMITER ;"`
 
-"\"Hello\"",
+## Test 3: Invalid Consecutive Operators
+- Input: `"123 ++ 456"`
+- Output: `"NUMBER 123, ERROR ++"`
 
-"/* comment */ x = 10; // line",
+## Test 4: Invalid Identifier Character
+- Input: `"x@ = 10;"`
+- Output: `"IDENTIFIER x, ERROR @, OPERATOR =, NUMBER 10, DELIMITER ;"`
 
-"123 + 456 - 789\n1 ++ 2",
+## Test 5: Basic String
+- Input: `"\"Hello\""`
+- Output: `"STRING \"Hello\""`
 
-"\"Lorem ipsum dolor sit amet, \nconsectetur adipiscing elit. Sed nunc orci, interdum at imperdiet ut, 
-fringilla\"",
+## Test 6: Comments
+- Input: `"/* comment */ x = 10; // line"`
+- Output: `"IDENTIFIER x, OPERATOR =, NUMBER 10, DELIMITER ;"`
 
-"\"This vallidates\tspacing escape\nsequences\"",
+## Test 7: Multi-line Input with Error
+- Input: `"123 + 456 - 789\n1 ++ 2"`
+- Output: `"NUMBER 123, OPERATOR +, NUMBER 456, OPERATOR -, NUMBER 789, NUMBER 1, ERROR ++, NUMBER 2"`
 
-"\"String with \\\"quotes\\\"\"",
+## Test 8: String Buffer Overflow
+- Input: `"\"Lorem ipsum dolor...\""`
+- Output: `"ERROR String too Long"`
 
-"\"Unterminated string",
+## Test 9: Escape Sequence Validation
+- Input: `"\"This vallidates\tspacing escape\nsequences\""`
+- Output: `"New Line operator"`
 
-"/* Unterminated comment\n"
+## Test 10: Escaped Quotes
+- Input: `"\"String with \\\"quotes\\\"\""`
+- Output: `"STRING \"String with \\\"quotes\\\"\""`
 
-Expected outputs:
+## Test 11: Unterminated String
+- Input: `"\"Unterminated string"`
+- Output: `"ERROR Unterminated string"`
 
-"NUMBER 123, OPERATOR +, NUMBER 456, OPERATOR -, NUMBER 789",
-
-"KEYWORD int, IDENTIFIER x, OPERATOR =, NUMBER 42, DELIMITER ;, IDENTIFIER y, OPERATOR =, IDENTIFIER x, OPERATOR +, NUMBER 10, DELIMITER ;",
-
-"NUMBER 123, ERROR ++",
-
-"IDENTIFIER x, ERROR @, OPERATOR =, NUMBER 10, DELIMITER ;",
-
-"STRING \"Hello\"",
-
-"IDENTIFIER x, OPERATOR =, NUMBER 10, DELIMITER ;",
-
-"NUMBER 123, OPERATOR +, NUMBER 456, OPERATOR -, NUMBER 789, NUMBER 1, ERROR ++, NUMBER 2",
-
-"ERROR String too Long",
-
-"New Line operator",
-
-"STRING \"String with \\\"quotes\\\"\"",
-
-"ERROR Unterminated string",
-
-"ERROR Unterminated comment"
+## Test 12: Unterminated Comment
+- Input: `"/* Unterminated comment\n"`
+- Output: `"ERROR Unterminated comment"`

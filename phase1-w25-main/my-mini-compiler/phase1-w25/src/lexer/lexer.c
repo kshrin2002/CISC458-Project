@@ -133,6 +133,7 @@ Token get_next_token(const char *input, int *pos) {
             if (input[*pos] == '\n') {
                 current_line++;
             }
+
             if (input[*pos] == '*' && input[*pos + 1] == '/') {
                 (*pos) += 2; // skip the closing comment
                 comment_check = 1;
@@ -192,6 +193,9 @@ Token get_next_token(const char *input, int *pos) {
     // Added by Dharsan
     // Handle string literals
     if (c == '"') {
+        // used to check if string closed
+        int close_check = 0;
+
         int i = 0;
         // add and skip the first quote character
         token.lexeme[i++] = c;
@@ -229,9 +233,15 @@ Token get_next_token(const char *input, int *pos) {
                 if (input[*pos] == '"') {
                     (*pos) += 1; // skip the closing comment
                     break;
+                    close_check = 1;
                 }
                 (*pos)++;
             }
+            // overrides buffer error as string actually has not been terminated and too long
+            if (close_check==0){
+                token.error = ERROR_UNTERMINATED_STRING;
+            }
+
             return token;
         }
 
